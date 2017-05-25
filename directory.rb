@@ -1,3 +1,5 @@
+require 'csv'
+
 @students = [] # an ampty array accessible to all methods
 @filename = ""
 
@@ -73,19 +75,17 @@ def process(selection)
 end
 
 def save_students
-  File.open(@filename, "w") do |file|
+  CSV.open(@filename, "w") do |file|
     @students.each do |student|
-      student_data = [student[:name], student[:cohort]]
-      csv_line = student_data.join(",")
-      file.puts csv_line
+      file << [student[:name], student[:cohort]]
     end
   end
-  puts "Saved #{@students.count} students."
+  puts "Saved #{@students.count} students to #{@filename}"
 end
 
 def load_students
-  File.open(@filename, "r").readlines.each do |line|
-    name, cohort = line.chomp.split(",")
+  CSV.foreach(@filename) do |line|
+    name, cohort = line
     insert_students_to_array(name, cohort)
   end
   puts "Loaded #{@students.count} students."
