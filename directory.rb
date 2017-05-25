@@ -73,25 +73,22 @@ def process(selection)
 end
 
 def save_students
-  file = File.open(@filename, "w")
-
-  @students.each do |student|
-    student_data = [student[:name], student[:cohort]]
-    csv_line = student_data.join(",")
-    file.puts csv_line
+  File.open(@filename, "w") do |file|
+    @students.each do |student|
+      student_data = [student[:name], student[:cohort]]
+      csv_line = student_data.join(",")
+      file.puts csv_line
+    end
   end
   puts "Saved #{@students.count} students."
-  file.close
 end
 
 def load_students
-  file = File.open(@filename, "r")
-  file.readlines.each do |line|
+  File.open(@filename, "r").readlines.each do |line|
     name, cohort = line.chomp.split(",")
     insert_students_to_array(name, cohort)
   end
   puts "Loaded #{@students.count} students."
-  file.close
 end
 
 def try_load_students
