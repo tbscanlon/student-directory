@@ -1,5 +1,5 @@
 @students = [] # an ampty array accessible to all methods
-@filename = "students.csv"
+@filename = ""
 
 def input_students
   puts "Please enter the names of the students."
@@ -54,20 +54,26 @@ def show_students
   print_footer
 end
 
+def change_filename
+  puts "Enter a new file for saving and loading student data"
+  @filename = STDIN.gets.chomp
+  puts "Working file has been changed to #{@filename}"
+end
+
 def process(selection)
   case selection
   when "1" then input_students
   when "2" then show_students
   when "3" then save_students
-  when "4" then load_students("students.csv")
-  when "5" then @filename = STDIN.gets.chomp
+  when "4" then load_students
+  when "5" then change_filename
   when "9" then exit
   else puts "I don't know what you mean, try again"
   end
 end
 
 def save_students
-  file = File.open("students.csv", "w")
+  file = File.open(@filename, "w")
 
   @students.each do |student|
     student_data = [student[:name], student[:cohort]]
@@ -78,8 +84,8 @@ def save_students
   file.close
 end
 
-def load_students(filename)
-  file = File.open(filename, "r")
+def load_students
+  file = File.open(@filename, "r")
   file.readlines.each do |line|
     name, cohort = line.chomp.split(",")
     insert_students_to_array(name, cohort)
@@ -89,8 +95,8 @@ def load_students(filename)
 end
 
 def try_load_students
-  filename = ARGV.first.nil? ? "students.csv" : ARGV.first
-  File.exists?(filename) ? load_students(filename) : (puts "#{filename} not found - skipping loading.")
+  @filename = ARGV.first.nil? ? "students.csv" : ARGV.first
+  File.exists?(@filename) ? load_students : (puts "#{@filename} not found - skipping loading.")
 end
 
 try_load_students
