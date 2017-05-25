@@ -1,15 +1,15 @@
 @students = [] # an ampty array accessible to all methods
+@filename = "students.csv"
 
 def input_students
   puts "Please enter the names of the students."
   puts "To finish, just hit return twice"
-  #students = [] # create an empty array
-  name = STDIN.gets.chomp # get the first name
+  name = STDIN.gets.chomp
 
   while !name.empty? do
     insert_students_to_array(name)
     puts "Now we have #{@students.count} students"
-    name = STDIN.gets.chomp # get another name from the user
+    name = STDIN.gets.chomp
   end
 end
 
@@ -29,7 +29,7 @@ def print_students_list
 end
 
 def print_footer
-  puts "Overall, we have #{@students.count} great students"
+  puts @students.count == 1 ? "Overall, we have #{@students.count} great student" : "Overall, we have #{@students.count} great students"
 end
 
 def interactive_menu
@@ -42,8 +42,9 @@ end
 def print_menu
   puts "1. Input the students"
   puts "2. Show the students"
-  puts "3. Save the list to students.csv"
-  puts "4. Load the list from students.csv"
+  puts "3. Save the list to #{@filename}"
+  puts "4. Load the list from #{@filename}"
+  puts "5. Set the file where student data should be accessed"
   puts "9. Exit"
 end
 
@@ -55,58 +56,42 @@ end
 
 def process(selection)
   case selection
-  when "1"
-    input_students
-  when "2"
-    show_students
-  when "3"
-    save_students
-  when "4"
-    load_students
-  when "9"
-    exit
-  else
-    puts "I don't know what you mean, try again"
+  when "1" then input_students
+  when "2" then show_students
+  when "3" then save_students
+  when "4" then load_students("students.csv")
+  when "5" then @filename = STDIN.gets.chomp
+  when "9" then exit
+  else puts "I don't know what you mean, try again"
   end
 end
 
 def save_students
-  #open the file for writing
   file = File.open("students.csv", "w")
-  #iterate over the array of students
+
   @students.each do |student|
     student_data = [student[:name], student[:cohort]]
     csv_line = student_data.join(",")
     file.puts csv_line
   end
+  puts "Saved #{@students.count} students."
   file.close
 end
 
-def load_students(filename="students.csv")
+def load_students(filename)
   file = File.open(filename, "r")
   file.readlines.each do |line|
     name, cohort = line.chomp.split(",")
     insert_students_to_array(name, cohort)
   end
+  puts "Loaded #{@students.count} students."
   file.close
 end
 
 def try_load_students
-  filename = ARGV.first # First argument from the command line
-  return if filename.nil? # get out of the method if it isn't given
-  if File.exists?(filename) # if it exists
-    load_students(filename)
-    puts "Loaded #{@students.count} from #{filename}"
-  else
-    puts "Sorry, #{filename} doesn't exist."
-    exit
-  end
+  filename = ARGV.first.nil? ? "students.csv" : ARGV.first
+  File.exists?(filename) ? load_students(filename) : (puts "#{filename} not found - skipping loading.")
 end
-
-# students = input_students
-# print_header
-# print(students)
-# print_footer(students)
 
 try_load_students
 interactive_menu
